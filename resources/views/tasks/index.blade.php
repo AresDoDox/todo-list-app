@@ -7,6 +7,13 @@
             <a href="{{ route('tasks.create') }}" class="btn btn-sm btn-primary">+ Thêm Task</a>
         </div>
         <div class="card-body">
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
             <table class="table table-hover align-middle">
                 <thead>
                     <tr>
@@ -26,15 +33,15 @@
                             <td>{{ $task->due_date }}</td>
                             <td>
                                 @switch ($task->status)
-                                    @case('pending')
+                                    @case('0')
                                         <span class="badge bg-secondary">Chưa làm</span>
                                     @break
 
-                                    @case('in_progress')
+                                    @case('1')
                                         <span class="badge bg-warning">Đang làm</span>
                                     @break
 
-                                    @case('completed')
+                                    @case('2')
                                         <span class="badge bg-success">Hoàn thành</span>
                                     @break
 
