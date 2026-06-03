@@ -8,26 +8,41 @@
                     <h5 class="mb-0">+ Thêm công việc</h5>
                 </div>
                 <div class="card-body">
-                    <form>
+                    <form action="{{ route('tasks.store') }}" method="POST" novalidate>
+                        @csrf
+                        @method('POST')
                         <div class="mb-3">
                             <label for="title" class="form-label">Tên công việc</label>
-                            <input type="text" class="form-control" id="title" placeholder="Nhập tên công việc..."
-                                required>
+                            <input type="text" name="title" class="form-control" id="title"
+                                placeholder="Nhập tên công việc..." required>
+                            @error('title')
+                                <div class="text-danger mt-1">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label for="description" class="form-label">Mô tả</label>
-                            <textarea class="form-control" id="description" rows="3" placeholder="Nhập mô tả chi tiết..."></textarea>
+                            <textarea class="form-control" name="description" id="description" rows="3" placeholder="Nhập mô tả chi tiết..."></textarea>
+                            @error('description')
+                                <div class="text-danger mt-1">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label for="due_date" class="form-label">Hạn chót</label>
-                            <input type="date" class="form-control" id="due_date">
+                            <input type="date" name="due_date" class="form-control" id="due_date">
+                            @error('due_date')
+                                <div class="text-danger mt-1">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label for="status" class="form-label">Trạng thái</label>
-                            <select id="status" class="form-select">
-                                <option value="pending">Đang làm</option>
-                                <option value="done">Hoàn thành</option>
+                            <select name="status" id="status" class="form-select">
+                                <option value="0">Chưa làm</option>
+                                <option value="1">Đang làm</option>
+                                <option value="2">Hoàn thành</option>
                             </select>
+                            @error('status')
+                                <div class="text-danger mt-1">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="d-flex justify-content-between">
                             <a href="{{ route('tasks.index') }}" class="btn btn-secondary">⬅ Quay lại</a>

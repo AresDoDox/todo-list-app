@@ -35,7 +35,7 @@
                                     @break
 
                                     @case('completed')
-                                        <span class="badge bg-success">Đã hoàn thành</span>
+                                        <span class="badge bg-success">Hoàn thành</span>
                                     @break
 
                                     @default
