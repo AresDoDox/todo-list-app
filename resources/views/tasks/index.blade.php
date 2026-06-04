@@ -49,6 +49,7 @@
                         <th class="w-25">Công việc</th>
                         <th>Hạn chót</th>
                         <th>Trạng thái</th>
+                        <th>Thay đổi trạng thái</th>
                         <th>Thời gian tạo</th>
                         <th>Người tạo</th>
                         <th class="text-end">Hành động</th>
@@ -57,7 +58,7 @@
                 <tbody>
                     <!-- Demo static -->
                     @forelse ($tasks as $task)
-                        <tr>
+                        <tr data-id="{{ $task->id }}">
                             <td>{{ $task->id }}</td>
                             <td>{{ $task->title }}</td>
                             <td>{{ $task->due_date }}</td>
@@ -78,6 +79,19 @@
                                     @default
                                         <span class="badge bg-secondary">Không xác định</span>
                                 @endswitch
+                            </td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button"
+                                        id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Thay đổi trạng thái
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <li><a class="dropdown-item change-status" data-status="0">Chưa làm</a></li>
+                                        <li><a class="dropdown-item change-status" data-status="1">Đang làm</a></li>
+                                        <li><a class="dropdown-item change-status" data-status="2">Hoàn thành</a></li>
+                                    </ul>
+                                </div>
                             </td>
                             <td>{{ $task->created_at->format('d/m/Y H:i') }}</td>
                             <td>{{ $task->user->name }}</td>
@@ -109,3 +123,54 @@
             </div>
         </div>
     @endsection
+
+    @push('scripts')
+        <script>
+            $(document).ready(function() {
+                $('.change-status').click(function(e) {
+                    e.preventDefault();
+
+                    var status = $(this).data('status');
+                    var taskId = $(this).closest('tr').data('id');
+
+                    $.ajax({
+                        url: '/tasks/' + taskId + '/status',
+                        method: 'PATCH',
+                        data: {
+                            status: status,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                const statusBadge = $('tr[data-id="' + taskId +
+                                    '"] td:nth-child(4) .badge');
+                                switch (status) {
+                                    case 0:
+                                        statusBadge.removeClass().addClass('badge bg-secondary')
+                                            .text('Chưa làm');
+                                        break;
+                                    case 1:
+                                        statusBadge.removeClass().addClass('badge bg-warning').text(
+                                            'Đang làm');
+                                        break;
+                                    case 2:
+                                        statusBadge.removeClass().addClass('badge bg-success').text(
+                                            'Hoàn thành');
+                                        break;
+                                    default:
+                                        statusBadge.removeClass().addClass('badge bg-secondary')
+                                            .text('Không xác định');
+                                }
+                            } else {
+                                alert('Cập nhật thất bại. Vui lòng thử lại.');
+                            }
+                        },
+                        error: function(error) {
+                            console.error(error);
+                            alert('Có lỗi xảy ra. Vui lòng thử lại.');
+                        }
+                    });
+                });
+            });
+        </script>
+    @endpush

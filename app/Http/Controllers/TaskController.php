@@ -110,4 +110,18 @@ class TaskController extends Controller
         $task->delete();
         return redirect()->route('tasks.index')->with('success', 'Công việc đã được xóa thành công!');
     }
+
+    public function updateStatus(Request $request, string $id)
+    {
+        $task = Task::findOrFail($id);
+        $request->validate([
+            'status' => 'required|in:' . Task::STATUS_PENDING . ',' . Task::STATUS_IN_PROGRESS . ',' . Task::STATUS_COMPLETED,
+        ]);
+        $task->update(['status' => $request->status]);
+        return response()->json([
+            'success' => true,
+            'message' => 'Trạng thái đã được cập nhật thành công!',
+            'status' => $request->status,
+        ]);
+    }
 }
