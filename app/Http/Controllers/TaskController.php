@@ -6,17 +6,50 @@ use App\Models\Task;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreTaskRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class TaskController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $query = Task::query();
+
         // $tasks = Task::all();
         // $tasks = Task::latest()->paginate(10);
-        $tasks = Task::with('user')->orderBy('due_date', 'asc')->paginate(10);
+        // $tasks = Task::with('user')->orderBy('due_date', 'asc')->paginate(10);
+
+        // filter by search
+        if ($request->has('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%')->orWhere('description', 'like', '%' . $request->search . '%');
+        }
+
+        // DEBUG: In toàn bộ request
+        Log::info('=== REQUEST DATA ===', $request->all());
+        Log::info('Status raw: ' . $request->input('status'));
+        Log::info('Status exists: ' . ($request->has('status') ? 'yes' : 'no'));
+        Log::info('Status filled: ' . ($request->filled('status') ? 'yes' : 'no'));
+
+        // filter by status
+        if ($request->filled('status') && in_array($request->status, [Task::STATUS_PENDING, Task::STATUS_IN_PROGRESS, Task::STATUS_COMPLETED])) {
+            $query->where('status', $request->status);
+        }
+
+        // sort results
+        switch ($request->get('sort_option')) {
+            case 'created_at':
+                $query->orderBy('created_at', 'desc');
+                break;
+            case 'due_date':
+                $query->orderBy('due_date', 'asc');
+                break;
+            default:
+                $query->latest();
+        }
+
+        $tasks = $query->with('user')->paginate(10)->appends($request->all());
         return view('tasks.index', compact('tasks'));
     }
 

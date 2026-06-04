@@ -1,18 +1,46 @@
 @extends('tasks.layout')
 
 @section('content')
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
     <div class="card shadow-sm">
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Danh sách công việc</h5>
             <a href="{{ route('tasks.create') }}" class="btn btn-sm btn-primary">+ Thêm Task</a>
         </div>
         <div class="card-body">
-            @if (session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <form class="filter row mb-3" method="GET" action="{{ route('tasks.index') }}">
+                <div class="col-md-3">
+                    <input type="text" name="search" class="form-control" placeholder="Tìm kiếm theo tên công việc"
+                        value="{{ request('search') }}">
                 </div>
-            @endif
+                <div class="col-md-3">
+                    <select name="status" class="form-select">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Chưa làm</option>
+                        <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Đang làm</option>
+                        <option value="2" {{ request('status') == '2' ? 'selected' : '' }}>Hoàn thành</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="sort_option" class="form-select">
+                        <option value="default" {{ !request('sort_option') ? 'selected' : '' }}>Sắp xếp theo</option>
+                        <option value="created_at" {{ request('sort_option') === 'created_at' ? 'selected' : '' }}>Thời gian
+                            tạo
+                        </option>
+                        <option value="due_date" {{ request('sort_option') === 'due_date' ? 'selected' : '' }}>Hạn chót
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-md btn-secondary">Lọc</button>
+                    <a href="{{ route('tasks.index') }}" class="btn btn-md btn-outline-secondary">Xóa lọc</a>
+                </div>
+            </form>
 
             <table class="table table-hover align-middle">
                 <thead>
@@ -35,15 +63,15 @@
                             <td>{{ $task->due_date }}</td>
                             <td>
                                 @switch ($task->status)
-                                    @case('0')
+                                    @case(0)
                                         <span class="badge bg-secondary">Chưa làm</span>
                                     @break
 
-                                    @case('1')
+                                    @case(1)
                                         <span class="badge bg-warning">Đang làm</span>
                                     @break
 
-                                    @case('2')
+                                    @case(2)
                                         <span class="badge bg-success">Hoàn thành</span>
                                     @break
 
