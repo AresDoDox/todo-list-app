@@ -18,9 +18,11 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Công việc</th>
+                        <th class="w-25">Công việc</th>
                         <th>Hạn chót</th>
                         <th>Trạng thái</th>
+                        <th>Thời gian tạo</th>
+                        <th>Người tạo</th>
                         <th class="text-end">Hành động</th>
                     </tr>
                 </thead>
@@ -49,6 +51,8 @@
                                         <span class="badge bg-secondary">Không xác định</span>
                                 @endswitch
                             </td>
+                            <td>{{ $task->created_at->format('d/m/Y H:i') }}</td>
+                            <td>{{ $task->user->name }}</td>
                             <td class="text-end">
                                 <a href="{{ route('tasks.show', $task->id) }}"
                                     class="btn btn-sm btn-info text-white">Xem</a>
@@ -69,6 +73,11 @@
                         @endforelse
                     </tbody>
                 </table>
+
+                {{-- pagination --}}
+                <div>
+                    {{ $tasks->links('vendor.pagination.bootstrap-5') }}
+                </div>
             </div>
         </div>
     @endsection
