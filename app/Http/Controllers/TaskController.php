@@ -14,7 +14,9 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $tasks = Task::all();
+        // $tasks = Task::all();
+        // $tasks = Task::latest()->paginate(10);
+        $tasks = Task::with('user')->orderBy('due_date', 'asc')->paginate(10);
         return view('tasks.index', compact('tasks'));
     }
 
