@@ -42,7 +42,8 @@ class TaskController extends Controller
      */
     public function show(string $id)
     {
-        return view('tasks.show');
+        $task = Task::findOrFail($id);
+        return view('tasks.show', compact('task'));
     }
 
     /**
@@ -50,7 +51,8 @@ class TaskController extends Controller
      */
     public function edit(string $id)
     {
-        return view('tasks.edit');
+        $task = Task::findOrFail($id);
+        return view('tasks.edit', compact('task'));
     }
 
     /**
@@ -58,7 +60,10 @@ class TaskController extends Controller
      */
     public function update(StoreTaskRequest $request, string $id)
     {
-        //
+        $task = Task::findOrFail($id);
+        $data = $request->validated();
+        $task->update($data);
+        return redirect()->route('tasks.index')->with('success', 'Công việc đã được cập nhật thành công!');
     }
 
     /**
