@@ -124,4 +124,54 @@ class TaskController extends Controller
             'status' => $request->status,
         ]);
     }
+
+    public function trash(Request $request)
+    {
+        $query = Task::query();
+
+        // filter by search
+        if ($request->has('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%')->orWhere('description', 'like', '%' . $request->search . '%');
+        }
+
+        // filter by status
+        if ($request->filled('status') && in_array($request->status, [Task::STATUS_PENDING, Task::STATUS_IN_PROGRESS, Task::STATUS_COMPLETED])) {
+            $query->where('status', $request->status);
+        }
+
+        // sort results
+        switch ($request->get('sort_option')) {
+            case 'created_at':
+                $query->orderBy('created_at', 'desc');
+                break;
+            case 'due_date':
+                $query->orderBy('due_date', 'asc');
+                break;
+            default:
+                $query->latest();
+        }
+
+        $tasks = $query->onlyTrashed()->with('user')->paginate(10)->appends($request->all());
+        return view('tasks.trash', compact('tasks'));
+    }
+
+    public function restore(string $id)
+    {
+        $task = Task::onlyTrashed()->findOrFail($id);
+        $task->restore();
+        return redirect()->route('tasks.trash')->with('success', 'Công việc đã được khôi phục thành công!');
+    }
+
+    public function forceDelete(string $id)
+    {
+        $task = Task::onlyTrashed()->findOrFail($id);
+        $task->forceDelete();
+        return redirect()->route('tasks.trash')->with('success', 'Công việc đã được xóa vĩnh viễn!');
+    }
+
+    public function forceDeleteAll()
+    {
+        Task::onlyTrashed()->forceDelete();
+        return redirect()->route('tasks.trash')->with('success', 'Tất cả công việc đã được xóa vĩnh viễn!');
+    }
 }
