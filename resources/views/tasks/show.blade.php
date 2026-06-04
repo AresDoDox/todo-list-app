@@ -9,14 +9,31 @@
                     <a href="{{ route('tasks.index') }}" class="btn btn-sm btn-secondary">⬅ Quay lại</a>
                 </div>
                 <div class="card-body">
-                    <h4 class="fw-bold mb-3">Học Laravel</h4>
+                    <h4 class="fw-bold mb-3">{{ $task->title }}</h4>
                     <p class="text-muted"><strong>Mô tả:</strong></p>
-                    <p>Hoàn thành các chức năng CRUD và tìm hiểu middleware.</p>
-                    <p><strong>Hạn chót:</strong> <span class="badge bg-danger">2025-10-01</span></p>
-                    <p><strong>Trạng thái:</strong> <span class="badge bg-warning">Đang làm</span></p>
+                    <p>{{ $task->description }}</p>
+                    <p><strong>Hạn chót:</strong> <span class="badge bg-danger">{{ $task->due_date }}</span></p>
+                    <p><strong>Trạng thái:</strong>
+                        @switch ($task->status)
+                            @case('0')
+                                <span class="badge bg-secondary">Chưa làm</span>
+                            @break
+
+                            @case('1')
+                                <span class="badge bg-warning">Đang làm</span>
+                            @break
+
+                            @case('2')
+                                <span class="badge bg-success">Hoàn thành</span>
+                            @break
+
+                            @default
+                                <span class="badge bg-secondary">Không xác định</span>
+                        @endswitch
+                    </p>
 
                     <div class="mt-4 d-flex justify-content-end">
-                        <a href="{{ route('tasks.edit', 1) }}" class="btn btn-warning me-2">✏️ Sửa</a>
+                        <a href="{{ route('tasks.edit', $task->id) }}" class="btn btn-warning me-2">✏️ Sửa</a>
                         <button class="btn btn-danger">🗑 Xóa</button>
                     </div>
                 </div>
